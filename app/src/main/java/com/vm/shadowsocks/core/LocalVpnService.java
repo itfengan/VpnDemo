@@ -21,10 +21,13 @@ import com.vm.shadowsocks.tcpip.TCPHeader;
 import com.vm.shadowsocks.tcpip.UDPHeader;
 import com.vm.shadowsocks.ui.MainActivity;
 
+import org.apache.http.conn.util.InetAddressUtils;
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Map;
@@ -257,9 +260,9 @@ public class LocalVpnService extends VpnService implements Runnable {
         // TODO: 2018/7/19 在此拦截禁止的ip
         Log.e("fengan","getSourceIP="+CommonMethods.ipIntToString(ipHeader.getSourceIP()));
         Log.e("fengan","getDestinationIP="+CommonMethods.ipIntToString(ipHeader.getDestinationIP()));
-        if (CommonMethods.ipIntToString(ipHeader.getDestinationIP()).equals("116.62.244.130")) {
-            return;
-        }
+//        if (CommonMethods.ipIntToString(ipHeader.getDestinationIP()).equals("116.62.244.130")) {
+//            return;
+//        }
         switch (ipHeader.getProtocol()) {
             case IPHeader.TCP:
                 TCPHeader tcpHeader = m_TCPHeader;
@@ -352,6 +355,7 @@ public class LocalVpnService extends VpnService implements Runnable {
 
         IPAddress ipAddress = ProxyConfig.Instance.getDefaultLocalIP();
         LOCAL_IP = CommonMethods.ipStringToInt(ipAddress.Address);
+//        builder.addAddress(InetAddress.getLocalHost(), 32);
         builder.addAddress(ipAddress.Address, ipAddress.PrefixLength);
         if (ProxyConfig.IS_DEBUG)
             System.out.printf("addAddress: %s/%d\n", ipAddress.Address, ipAddress.PrefixLength);
@@ -373,7 +377,12 @@ public class LocalVpnService extends VpnService implements Runnable {
             if (ProxyConfig.IS_DEBUG)
                 System.out.printf("addRoute for FAKE_NETWORK: %s/%d\n", CommonMethods.ipIntToString(ProxyConfig.FAKE_NETWORK_IP), 16);
         } else {
-            builder.addRoute("0.0.0.0", 0);
+//            builder.addRoute("0.0.0.0", 0);
+            // TODO: 2018/7/20 在这里添加要拦截的ip 
+            byte[] addr = {116,62,(byte)244,(byte)130};
+            InetAddress lessWrong = InetAddress.getByAddress(addr);
+            builder.addRoute(lessWrong, 32);
+//            builder.addRoute("116.62.244.130", 0);
             if (ProxyConfig.IS_DEBUG)
                 System.out.printf("addDefaultRoute: 0.0.0.0/0\n");
         }

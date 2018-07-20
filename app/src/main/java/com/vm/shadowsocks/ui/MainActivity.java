@@ -358,6 +358,7 @@ public class MainActivity extends Activity implements
 
                 return true;
             case R.id.menu_item_toggle_global:
+                // TODO: 2018/7/20 指定全局，使全部请求都走代理 
                 ProxyConfig.Instance.globalMode = !ProxyConfig.Instance.globalMode;
                 if (ProxyConfig.Instance.globalMode) {
                     onLogReceived("Proxy global mode is on");
